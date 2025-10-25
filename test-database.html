@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste - Conexão com Banco de Dados</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        button {
+            background-color: #4a7c59;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background-color: #3a6b49;
+        }
+        .data-display {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-online { background-color: #28a745; }
+        .status-offline { background-color: #dc3545; }
+        .status-unknown { background-color: #ffc107; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗄️ Teste de Conexão com Banco de Dados</h1>
+        
+        <div class="test-section">
+            <h2>📊 Status da Conexão</h2>
+            <div id="connectionStatus">
+                <span class="status-indicator status-unknown"></span>
+                <span>Verificando conexão...</span>
+            </div>
+            <button onclick="testDatabaseConnection()">Testar Conexão</button>
+            <button onclick="testCreatePost()">Testar Criação de Post</button>
+            <button onclick="testGetPosts()">Testar Busca de Posts</button>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 Teste de Criação de Post</h2>
+            <div class="form-group">
+                <label for="testPlantType">Tipo de Planta:</label>
+                <input type="text" id="testPlantType" value="Tomate Teste DB">
+            </div>
+            <div class="form-group">
+                <label for="testPlantAge">Idade (dias):</label>
+                <input type="text" id="testPlantAge" value="30">
+            </div>
+            <div class="form-group">
+                <label for="testHeight">Altura (cm):</label>
+                <input type="text" id="testHeight" value="25.5">
+            </div>
+            <div class="form-group">
+                <label for="testNotes">Observações:</label>
+                <textarea id="testNotes">Post de teste para verificar conexão com banco de dados</textarea>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📋 Resultados dos Testes</h2>
+            <div id="testResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 Informações de Debug</h2>
+            <button onclick="showDebugInfo()">Mostrar Info de Debug</button>
+            <div id="debugInfo" class="data-display"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📖 Instruções de Configuração</h2>
+            <div class="info">
+                <h3>Para configurar o banco de dados:</h3>
+                <ol>
+                    <li><strong>Criar conta no Neon:</strong> <a href="https://console.neon.tech" target="_blank">console.neon.tech</a></li>
+                    <li><strong>Criar projeto:</strong> Nome: "horta-stats"</li>
+                    <li><strong>Copiar Connection String:</strong> Formato: postgresql://user:pass@host:port/db</li>
+                    <li><strong>Configurar no Netlify:</strong> Site Settings > Environment Variables</li>
+                    <li><strong>Adicionar variável:</strong> NETLIFY_DATABASE_URL = sua-connection-string</li>
+                    <li><strong>Inicializar banco:</strong> curl -X POST https://seudominio.netlify.app/.netlify/functions/db-setup</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script src="api-client.js"></script>
+    <script>
+        let connectionStatus = 'unknown';
+
+        function showResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('testResults');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.textContent = message;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        function clearResults() {
+            document.getElementById('testResults').innerHTML = '';
+        }
+
+        function updateConnectionStatus(status, message) {
+            connectionStatus = status;
+            const statusDiv = document.getElementById('connectionStatus');
+            const indicator = statusDiv.querySelector('.status-indicator');
+            
+            indicator.className = `status-indicator status-${status}`;
+            statusDiv.innerHTML = `<span class="status-indicator status-${status}"></span><span>${message}</span>`;
+        }
+
+        async function testDatabaseConnection() {
+            showResult('🔄 Testando conexão com banco de dados...', 'info');
+            
+            try {
+                const response = await fetch('/.netlify/functions/posts', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateConnectionStatus('online', 'Banco de dados conectado!');
+                    showResult(`✅ Conexão com banco estabelecida! Posts encontrados: ${data.posts.length}`, 'success');
+                    
+                    if (data.posts.length > 0) {
+                        showResult(`📋 Primeiro post: ${JSON.stringify(data.posts[0], null, 2)}`, 'info');
+                    }
+                } else {
+                    if (data.error && data.error.includes('Database not configured')) {
+                        updateConnectionStatus('offline', 'Banco não configurado');
+                        showResult(`⚠️ Banco de dados não configurado: ${data.error}`, 'warning');
+                        showResult(`💡 Configure NETLIFY_DATABASE_URL no Netlify Dashboard`, 'info');
+                    } else {
+                        updateConnectionStatus('offline', 'Erro de conexão');
+                        showResult(`❌ Erro na API: ${data.error}`, 'error');
+                    }
+                }
+            } catch (error) {
+                updateConnectionStatus('offline', 'Erro de rede');
+                showResult(`❌ Erro de conexão: ${error.message}`, 'error');
+                console.error('Connection test error:', error);
+            }
+        }
+
+        async function testCreatePost() {
+            showResult('🔄 Testando criação de post no banco...', 'info');
+            
+            try {
+                const postData = {
+                    plantType: document.getElementById('testPlantType').value,
+                    plantAge: document.getElementById('testPlantAge').value,
+                    plantingDate: '01/01/2024',
+                    height: document.getElementById('testHeight').value,
+                    weather: 'Ensolarado',
+                    temperature: '25°C',
+                    watering: 'Diário',
+                    fertilizer: 'Orgânico',
+                    pestProblems: 'Nenhum',
+                    notes: document.getElementById('testNotes').value,
+                    expectedHarvest: 'Março 2024',
+                    images: []
+                };
+
+                const response = await fetch('/.netlify/functions/posts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(postData)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult(`✅ Post criado com sucesso no banco! ID: ${data.post.id}`, 'success');
+                    showResult(`📝 Dados salvos: ${JSON.stringify(data.post, null, 2)}`, 'info');
+                } else {
+                    if (data.error && data.error.includes('Database not configured')) {
+                        showResult(`⚠️ Banco não configurado: ${data.error}`, 'warning');
+                    } else {
+                        showResult(`❌ Erro ao criar post: ${data.error}`, 'error');
+                    }
+                }
+            } catch (error) {
+                showResult(`❌ Erro no teste: ${error.message}`, 'error');
+                console.error('Create post test error:', error);
+            }
+        }
+
+        async function testGetPosts() {
+            showResult('🔄 Testando busca de posts do banco...', 'info');
+            
+            try {
+                const response = await fetch('/.netlify/functions/posts', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult(`✅ Posts carregados do banco: ${data.posts.length} encontrados`, 'success');
+                    
+                    if (data.posts.length > 0) {
+                        showResult(`📋 Último post: ${JSON.stringify(data.posts[0], null, 2)}`, 'info');
+                    } else {
+                        showResult('ℹ️ Nenhum post encontrado no banco', 'info');
+                    }
+                } else {
+                    showResult(`❌ Erro ao buscar posts: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Erro no teste: ${error.message}`, 'error');
+                console.error('Get posts test error:', error);
+            }
+        }
+
+        function showDebugInfo() {
+            const display = document.getElementById('debugInfo');
+            const info = {
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                connectionStatus: connectionStatus,
+                apiBaseURL: '/.netlify/functions',
+                localStorageData: localStorage.getItem('hortaPosts') ? 'Presente' : 'Vazio',
+                netlifyEnv: 'Verificar no Netlify Dashboard'
+            };
+            
+            display.textContent = `Debug Info:\n${JSON.stringify(info, null, 2)}`;
+        }
+
+        // Auto-test on page load
+        window.addEventListener('load', () => {
+            showResult('🚀 Página carregada. Clique em "Testar Conexão" para verificar o banco.', 'info');
+            setTimeout(() => testDatabaseConnection(), 1000);
+        });
+    </script>
+</body>
+</html>

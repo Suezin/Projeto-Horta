@@ -80,27 +80,35 @@ class HortaStatsAPI {
       if (response.ok) {
         return { success: true, posts: data.posts };
       } else {
+        // Check if it's a database connection error
+        if (data.error && data.error.includes('Database not configured')) {
+          console.log('Database not configured, using localStorage fallback');
+          return this.getLocalStoragePosts();
+        }
         throw new Error(data.error || 'API error');
       }
     } catch (error) {
       console.log('Netlify Functions failed, using localStorage:', error.message);
-      
-      // Fallback to localStorage with sample data
-      try {
-        const savedPosts = localStorage.getItem('hortaPosts');
-        if (savedPosts) {
-          const posts = JSON.parse(savedPosts);
-          return { success: true, posts: posts };
-        } else {
-          // Load sample data
-          const samplePosts = this.getSampleData();
-          localStorage.setItem('hortaPosts', JSON.stringify(samplePosts));
-          return { success: true, posts: samplePosts };
-        }
-      } catch (localError) {
-        console.error('Error loading posts:', localError);
-        return { success: false, error: 'Failed to load posts' };
+      return this.getLocalStoragePosts();
+    }
+  }
+
+  // Get posts from localStorage
+  getLocalStoragePosts() {
+    try {
+      const savedPosts = localStorage.getItem('hortaPosts');
+      if (savedPosts) {
+        const posts = JSON.parse(savedPosts);
+        return { success: true, posts: posts };
+      } else {
+        // Load sample data
+        const samplePosts = this.getSampleData();
+        localStorage.setItem('hortaPosts', JSON.stringify(samplePosts));
+        return { success: true, posts: samplePosts };
       }
+    } catch (localError) {
+      console.error('Error loading posts from localStorage:', localError);
+      return { success: false, error: 'Failed to load posts' };
     }
   }
 
