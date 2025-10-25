@@ -116,10 +116,36 @@ async function uploadImage(event, headers) {
     const body = JSON.parse(event.body);
     const { postId, filename, imageData, mimeType } = body;
 
+    if (!sql) {
+      return {
+        statusCode: 500,
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ error: 'Database not configured' })
+      };
+    }
+
+    if (!postId || !filename || !imageData || !mimeType) {
+      return {
+        statusCode: 400,
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ error: 'Missing required fields: postId, filename, imageData, mimeType' })
+      };
+    }
+
+    // Convert base64 to buffer
+    const imageBuffer = Buffer.from(imageData, 'base64');
+    const fileSize = imageBuffer.length;
+
     const [newImage] = await sql`
-      INSERT INTO images (post_id, filename, image_data, mime_type)
-      VALUES (${postId}, ${filename}, ${imageData}, ${mimeType})
-      RETURNING id, filename, mime_type, created_at
+      INSERT INTO images (post_id, filename, image_data, mime_type, file_size)
+      VALUES (${postId}, ${filename}, ${imageBuffer}, ${mimeType}, ${fileSize})
+      RETURNING id, filename, mime_type, file_size, created_at
     `;
 
     return {
@@ -134,7 +160,15 @@ async function uploadImage(event, headers) {
       })
     };
   } catch (error) {
-    throw new Error(`Failed to upload image: ${error.message}`);
+    console.error('Upload image error:', error);
+    return {
+      statusCode: 500,
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ error: 'Failed to upload image', details: error.message })
+    };
   }
 }
 

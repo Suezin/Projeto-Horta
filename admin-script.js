@@ -192,27 +192,29 @@ async function uploadImages() {
             images: []
         };
         
-        // Upload images first
-        for (const file of imageInput.files) {
-            const imageResult = await window.hortaAPI.uploadImage(null, file);
-            if (imageResult.success) {
-                postData.images.push({
-                    id: imageResult.image.id,
-                    filename: imageResult.image.filename,
-                    mime_type: imageResult.image.mime_type
-                });
-            }
-        }
-        
-        // Create post
+        // Create post first to get post ID
         const result = await window.hortaAPI.createPost(postData);
         
         if (result.success) {
-            // Add the new post to local posts array
-            posts.unshift(result.post);
-            savePosts(); // Save to localStorage
+            const postId = result.post.id;
             
-            showMessage('Dados e imagens enviados com sucesso!', 'success');
+            // Upload images and link to post
+            for (const file of imageInput.files) {
+                const imageResult = await window.hortaAPI.uploadImage(postId, file);
+                if (imageResult.success) {
+                    postData.images.push({
+                        id: imageResult.image.id,
+                        filename: imageResult.image.filename,
+                        mime_type: imageResult.image.mime_type,
+                        url: `/.netlify/functions/images?id=${imageResult.image.id}`
+                    });
+                }
+            }
+            
+            // Update post with image references
+            const updatedPost = { ...result.post, images: postData.images };
+            
+            showMessage('Dados e imagens enviados com sucesso para o banco de dados!', 'success');
             resetUploadForm();
             loadAdminPosts();
             updateAdminStats();

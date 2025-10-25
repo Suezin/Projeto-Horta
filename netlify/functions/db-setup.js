@@ -9,15 +9,41 @@ try {
 }
 
 exports.handler = async (event, context) => {
-  if (event.httpMethod !== 'POST') {
+  // Handle CORS preflight
+  if (event.httpMethod === 'OPTIONS') {
     return {
-      statusCode: 405,
-      body: JSON.stringify({ error: 'Method not allowed' })
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Methods': 'POST, GET'
+      },
+      body: ''
     };
   }
 
+  const headers = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Methods': 'POST, GET'
+  };
+
   try {
-    // Create tables if they don't exist
+    if (!sql) {
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ 
+          error: 'Database connection not configured',
+          message: 'Please set NETLIFY_DATABASE_URL environment variable'
+        })
+      };
+    }
+
+    console.log('Initializing database tables...');
+
+    // Create posts table
     await sql`
       CREATE TABLE IF NOT EXISTS posts (
         id SERIAL PRIMARY KEY,
@@ -42,6 +68,9 @@ exports.handler = async (event, context) => {
       )
     `;
 
+    console.log('Posts table created/verified');
+
+    // Create images table
     await sql`
       CREATE TABLE IF NOT EXISTS images (
         id SERIAL PRIMARY KEY,
@@ -49,10 +78,14 @@ exports.handler = async (event, context) => {
         filename VARCHAR(255) NOT NULL,
         image_data BYTEA NOT NULL,
         mime_type VARCHAR(100) NOT NULL,
+        file_size INTEGER,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `;
 
+    console.log('Images table created/verified');
+
+    // Create admin users table
     await sql`
       CREATE TABLE IF NOT EXISTS admin_users (
         id SERIAL PRIMARY KEY,
@@ -61,6 +94,8 @@ exports.handler = async (event, context) => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `;
+
+    console.log('Admin users table created/verified');
 
     // Insert default admin user if not exists
     await sql`

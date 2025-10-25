@@ -251,9 +251,11 @@ class HortaStatsAPI {
       if (response.ok) {
         return { success: true, image: data.image };
       } else {
+        console.error('Image upload error:', data.error);
         return { success: false, error: data.error };
       }
     } catch (error) {
+      console.error('Image upload network error:', error);
       return { success: false, error: 'Network error' };
     }
   }

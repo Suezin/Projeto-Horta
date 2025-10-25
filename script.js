@@ -118,7 +118,7 @@ function transformPostData(apiPost) {
         images: apiPost.images ? apiPost.images.map(img => ({
             id: img.id,
             name: img.filename,
-            url: img.url || `data:${img.mime_type};base64,${img.image_data || ''}`,
+            url: img.url || `/.netlify/functions/images?id=${img.id}`,
             mimeType: img.mime_type,
             createdAt: img.created_at
         })) : [],
