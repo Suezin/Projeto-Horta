@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HortaStats - Estatísticas de Desenvolvimento de Horta</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-seedling"></i>
+                <h1>HortaStats</h1>
+            </div>
+            <nav class="nav">
+                <a href="#home" class="nav-link active">Início</a>
+                <a href="#charts" class="nav-link">Gráficos</a>
+                <a href="#feed" class="nav-link">Galeria</a>
+                <a href="#stats" class="nav-link">Estatísticas</a>
+                <a href="admin.html" class="nav-link">Acesso</a>
+            </nav>
+        </div>
+    </header>
+
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Home Section -->
+        <section id="home" class="section active">
+            <div class="container">
+                <div class="hero">
+                    <h2>Bem-vindo ao HortaStats</h2>
+                    <p>Monitore o desenvolvimento da sua horta através de análises inteligentes</p>
+                </div>
+                
+                <!-- Navigation Cards -->
+                <div class="navigation-cards">
+                    <div class="nav-card" onclick="showSection('charts')">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Gráficos de Desenvolvimento</h3>
+                        <p>Visualize o crescimento e evolução das plantas</p>
+                    </div>
+                    <div class="nav-card" onclick="showSection('feed')">
+                        <i class="fas fa-images"></i>
+                        <h3>Galeria de Imagens</h3>
+                        <p>Veja todas as fotos e análises da horta</p>
+                    </div>
+                    <div class="nav-card" onclick="showSection('stats')">
+                        <i class="fas fa-chart-bar"></i>
+                        <h3>Estatísticas Gerais</h3>
+                        <p>Métricas e indicadores de performance</p>
+                    </div>
+                </div>
+
+                <!-- Stats Overview -->
+                <div class="stats-overview">
+                    <div class="stat-card">
+                        <i class="fas fa-seedling"></i>
+                        <h3 id="totalPlants">0</h3>
+                        <p>Plantas Monitoradas</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-images"></i>
+                        <h3 id="totalImages">0</h3>
+                        <p>Imagens Registradas</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-chart-line"></i>
+                        <h3 id="avgGrowthRate">0%</h3>
+                        <p>Crescimento Médio</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-leaf"></i>
+                        <h3 id="plantTypes">0</h3>
+                        <p>Tipos de Plantas</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <section id="charts" class="section">
+            <div class="container">
+                <h2>Gráficos de Desenvolvimento</h2>
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>Crescimento ao Longo do Tempo</h3>
+                        <canvas id="growthChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Saúde das Plantas</h3>
+                        <canvas id="healthChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Distribuição por Tipo de Planta</h3>
+                        <canvas id="plantTypeChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Altura das Plantas</h3>
+                        <canvas id="heightChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feed Section -->
+        <section id="feed" class="section">
+            <div class="container">
+                <h2>Galeria de Imagens</h2>
+                <div class="feed">
+                    <div id="postsContainer" class="posts-container">
+                        <!-- Posts will be dynamically loaded here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section id="stats" class="section">
+            <div class="container">
+                <h2>Estatísticas Detalhadas</h2>
+                <div class="detailed-stats">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <h4>Total de Análises</h4>
+                            <span id="totalAnalyses">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <h4>Plantas Monitoradas</h4>
+                            <span id="plantsMonitored">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <h4>Taxa de Sucesso</h4>
+                            <span id="successRate">0%</span>
+                        </div>
+                        <div class="stat-item">
+                            <h4>Última Atualização</h4>
+                            <span id="lastUpdate">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 HortaStats. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="api-client.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

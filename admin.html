@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HortaStats - Administração</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-seedling"></i>
+                <h1>HortaStats - Admin</h1>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Voltar ao Site</a>
+                <button class="logout-btn" onclick="logout()" style="display: none;">Logout</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Login Section -->
+    <div id="loginSection" class="login-section">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <i class="fas fa-lock"></i>
+                    <h2>Acesso Administrativo</h2>
+                    <p>Digite suas credenciais para acessar o painel de administração</p>
+                </div>
+                <form id="adminLoginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="adminUsername">Usuário:</label>
+                        <input type="text" id="adminUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPassword">Senha:</label>
+                        <input type="password" id="adminPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Entrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Content -->
+    <div id="adminContent" class="admin-content" style="display: none;">
+        <main class="main">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section active">
+                <div class="container">
+                    <h2>Painel Administrativo</h2>
+                    
+                    <!-- Stats Overview -->
+                    <div class="stats-overview">
+                        <div class="stat-card">
+                            <i class="fas fa-images"></i>
+                            <h3 id="adminTotalImages">0</h3>
+                            <p>Imagens Analisadas</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-chart-line"></i>
+                            <h3 id="adminGrowthRate">0%</h3>
+                            <p>Taxa de Crescimento</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-calendar"></i>
+                            <h3 id="adminDaysTracked">0</h3>
+                            <p>Dias Monitorados</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-upload"></i>
+                            <h3 id="adminTotalPosts">0</h3>
+                            <p>Postagens</p>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="quick-actions">
+                        <h3>Ações Rápidas</h3>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="showSection('upload')">
+                                <i class="fas fa-plus"></i> Nova Postagem
+                            </button>
+                            <button class="btn btn-secondary" onclick="showSection('posts')">
+                                <i class="fas fa-list"></i> Gerenciar Posts
+                            </button>
+                            <button class="btn btn-secondary" onclick="showSection('analytics')">
+                                <i class="fas fa-chart-bar"></i> Analytics
+                            </button>
+                            <button class="btn btn-secondary" onclick="showSection('settings')">
+                                <i class="fas fa-cog"></i> Configurações
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Upload Section -->
+            <section id="upload" class="section">
+                <div class="container">
+                    <h2>Upload de Imagens e Dados</h2>
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Arraste e solte suas imagens aqui ou clique para selecionar</p>
+                        <input type="file" id="imageInput" multiple accept="image/*" style="display: none;">
+                    </div>
+                    
+                    <div class="upload-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="plantType">Tipo de Planta:</label>
+                                <input type="text" id="plantType" placeholder="Ex: Tomate, Alface, Cenoura...">
+                            </div>
+                            <div class="form-group">
+                                <label for="plantAge">Idade da Planta (dias):</label>
+                                <input type="text" id="plantAge" placeholder="Ex: 30">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="plantingDate">Data do Plantio:</label>
+                                <input type="text" id="plantingDate" placeholder="Ex: 15/01/2024">
+                            </div>
+                            <div class="form-group">
+                                <label for="height">Altura da Planta (cm):</label>
+                                <input type="text" id="height" placeholder="Ex: 25.5">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="weather">Condições Climáticas:</label>
+                                <input type="text" id="weather" placeholder="Ex: Ensolarado, Nublado, Chuvoso...">
+                            </div>
+                            <div class="form-group">
+                                <label for="temperature">Temperatura (°C):</label>
+                                <input type="text" id="temperature" placeholder="Ex: 25.5">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="watering">Frequência de Regagem:</label>
+                                <input type="text" id="watering" placeholder="Ex: Diário, Dia sim dia não, Semanal...">
+                            </div>
+                            <div class="form-group">
+                                <label for="fertilizer">Uso de Fertilizante:</label>
+                                <input type="text" id="fertilizer" placeholder="Ex: Sim, Não, Apenas orgânico...">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="pestProblems">Problemas com Pragas:</label>
+                            <input type="text" id="pestProblems" placeholder="Ex: Nenhum, Pulgas, Lagartas, Fungos...">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="notes">Observações Detalhadas:</label>
+                            <textarea id="notes" placeholder="Descreva o estado geral da planta, mudanças observadas, tratamentos aplicados, etc..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="expectedHarvest">Data Esperada de Colheita:</label>
+                            <input type="text" id="expectedHarvest" placeholder="Ex: 15/04/2024">
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="uploadImages()">Enviar Imagens e Dados</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Posts Management Section -->
+            <section id="posts" class="section">
+                <div class="container">
+                    <h2>Gerenciar Postagens</h2>
+                    <div class="posts-management">
+                        <div class="management-actions">
+                            <button class="btn btn-secondary" onclick="refreshPosts()">
+                                <i class="fas fa-sync"></i> Atualizar Lista
+                            </button>
+                            <button class="btn btn-warning" onclick="clearAllPosts()">
+                                <i class="fas fa-trash"></i> Limpar Todas
+                            </button>
+                        </div>
+                        <div id="adminPostsContainer" class="admin-posts-container">
+                            <!-- Posts will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analytics" class="section">
+                <div class="container">
+                    <h2>Analytics Detalhados</h2>
+                    <div class="charts-container">
+                        <div class="chart-card">
+                            <h3>Crescimento ao Longo do Tempo</h3>
+                            <canvas id="adminGrowthChart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Saúde das Plantas</h3>
+                            <canvas id="adminHealthChart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Distribuição por Tipo de Planta</h3>
+                            <canvas id="adminPlantTypeChart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Altura das Plantas</h3>
+                            <canvas id="adminHeightChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="section">
+                <div class="container">
+                    <h2>Configurações do Sistema</h2>
+                    <div class="settings-grid">
+                        <div class="setting-card">
+                            <h3>Dados do Sistema</h3>
+                            <p>Total de postagens: <span id="settingsTotalPosts">0</span></p>
+                            <p>Última atualização: <span id="settingsLastUpdate">-</span></p>
+                            <button class="btn btn-secondary" onclick="exportData()">Exportar Dados</button>
+                        </div>
+                        <div class="setting-card">
+                            <h3>Limpeza</h3>
+                            <p>Remover dados antigos e otimizar sistema</p>
+                            <button class="btn btn-warning" onclick="clearOldData()">Limpar Dados Antigos</button>
+                        </div>
+                        <div class="setting-card">
+                            <h3>Backup</h3>
+                            <p>Criar backup dos dados atuais</p>
+                            <button class="btn btn-secondary" onclick="createBackup()">Criar Backup</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 HortaStats Admin. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="api-client.js"></script>
+    <script src="admin-script.js"></script>
+</body>
+</html>

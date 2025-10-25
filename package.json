@@ -1,0 +1,28 @@
+{
+  "name": "horta-stats",
+  "version": "1.0.0",
+  "description": "Sistema de estatísticas de desenvolvimento de horta",
+  "main": "index.html",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'No build step required'",
+    "deploy": "netlify deploy --prod"
+  },
+  "dependencies": {
+    "@netlify/neon": "^0.1.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "netlify-cli": "^15.0.0"
+  },
+  "keywords": [
+    "horta",
+    "estatisticas",
+    "desenvolvimento",
+    "plantas"
+  ],
+  "author": "HortaStats Team",
+  "license": "MIT"
+}
+
