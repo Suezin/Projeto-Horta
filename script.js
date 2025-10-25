@@ -9,6 +9,20 @@ document.addEventListener('DOMContentLoaded', function() {
     loadPostsFromAPI();
     updateStats();
     updateCharts();
+    
+    // Listen for data changes from admin page
+    window.addEventListener('hortaDataChanged', function(event) {
+        console.log('Data changed, reloading posts...');
+        loadPostsFromAPI();
+    });
+    
+    // Also listen for storage changes (when admin page is in different tab)
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'hortaPosts') {
+            console.log('Storage changed, reloading posts...');
+            loadPostsFromAPI();
+        }
+    });
 });
 
 // Initialize application

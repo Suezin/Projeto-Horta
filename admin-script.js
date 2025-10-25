@@ -208,6 +208,10 @@ async function uploadImages() {
         const result = await window.hortaAPI.createPost(postData);
         
         if (result.success) {
+            // Add the new post to local posts array
+            posts.unshift(result.post);
+            savePosts(); // Save to localStorage
+            
             showMessage('Dados e imagens enviados com sucesso!', 'success');
             resetUploadForm();
             loadAdminPosts();
@@ -282,6 +286,11 @@ function loadPosts() {
 
 function savePosts() {
     localStorage.setItem('hortaPosts', JSON.stringify(posts));
+    
+    // Dispatch custom event to notify other pages of data changes
+    window.dispatchEvent(new CustomEvent('hortaDataChanged', {
+        detail: { posts: posts }
+    }));
 }
 
 // Statistics
@@ -678,6 +687,10 @@ async function deletePost(postId) {
             const result = await window.hortaAPI.deletePost(postId);
             
             if (result.success) {
+                // Remove from local posts array
+                posts = posts.filter(post => post.id != postId);
+                savePosts(); // Update localStorage
+                
                 showMessage('Postagem excluída com sucesso!', 'success');
                 loadAdminPosts();
                 updateAdminStats();

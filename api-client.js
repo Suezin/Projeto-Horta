@@ -134,12 +134,23 @@ class HortaStatsAPI {
         const savedPosts = localStorage.getItem('hortaPosts');
         let posts = savedPosts ? JSON.parse(savedPosts) : [];
         
+        // Transform frontend data to API format for storage
         const newPost = {
           id: Date.now(),
-          ...postData,
+          plant_type: postData.plantType,
+          plant_age: postData.plantAge,
+          planting_date: postData.plantingDate,
+          height: postData.height,
+          weather: postData.weather,
+          temperature: postData.temperature,
+          watering: postData.watering,
+          fertilizer: postData.fertilizer,
+          pest_problems: postData.pestProblems,
+          notes: postData.notes,
+          expected_harvest: postData.expectedHarvest,
           created_at: new Date().toISOString(),
           author: 'admin',
-          images: []
+          images: postData.images || []
         };
         
         posts.unshift(newPost);
